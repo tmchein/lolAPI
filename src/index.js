@@ -31,7 +31,7 @@ app.get("/user/:username/:region", async (req, res) => {
 
   const rankedDivision = await fetchDivision(id, region);
   const matchList = await getSummonerMatchList(puuid, region);
-  const matchHistory = await getHistoryDetails(matchList, region);
+  const matchHistory = await getHistoryDetails(matchList, region, username);
 
   res.send({ summonerInfo, rankedDivision, matchHistory });
 });
