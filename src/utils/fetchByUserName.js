@@ -43,7 +43,7 @@ const getSummonerMatchList = (userPuuid, region) => {
   return new Promise((resolve, reject) => {
     const continent = getContinentByRegion(region);
     request(
-      `https://${continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/${userPuuid}/ids?start=0&count=20&api_key=${process.env.API_KEY}`,
+      `https://${continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/${userPuuid}/ids?start=0&count=10&api_key=${process.env.API_KEY}`,
       { json: true },
       (error, response, body) => {
         if (error || body.length <= 0) {
@@ -55,18 +55,54 @@ const getSummonerMatchList = (userPuuid, region) => {
   });
 };
 
-const getHistoryDetails = (matchIdArray, region) => {
-  const continent = getContinentByRegion(region);
-  matchIdArray.map((match) => {
-    request(
-      `https://${continent}.api.riotgames.com/lol/match/v5/matches/${match}?api_key=${process.env.API_KEY}`,
-      { json: true },
-      (error, response, body) => {
-        const { metadata } = body;
+const getHistoryDetails = async (matchIdArray, region) => {
+  return new Promise((resolve, reject) => {
+    const continent = getContinentByRegion(region);
 
-        console.log(metadata);
-      }
-    );
+    matchIdArray.map((match) => {
+      request(
+        `https://${continent}.api.riotgames.com/lol/match/v5/matches/${match}?api_key=${process.env.API_KEY}`,
+        { json: true },
+        (error, response, body) => {
+          const {
+            info: { gameCreation, participants },
+          } = body;
+
+          const gameParticipants = participants.map(
+            ({
+              summonerName,
+              championName,
+              item1,
+              item2,
+              item3,
+              item4,
+              item5,
+              item6,
+              kills,
+              deaths,
+              assists,
+            }) => {
+              return {
+                summonerName,
+                championName,
+                item1,
+                item2,
+                item3,
+                item4,
+                item5,
+                item6,
+                score: `${kills}/${deaths}/${assists}`,
+              };
+            }
+          );
+
+          console.log("START////////////////////////");
+          console.log(gameParticipants);
+          console.log("FINISH//////////////////////// \n");
+          resolve(gameParticipants);
+        }
+      );
+    });
   });
 };
 
