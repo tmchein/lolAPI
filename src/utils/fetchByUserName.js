@@ -56,9 +56,11 @@ const getSummonerMatchList = (userPuuid, region) => {
   });
 };
 
-const getHistoryDetails = (matchIdArray, region) => {
+const getHistoryDetails = async (matchIdArray, region) => {
   const continent = getContinentByRegion(region);
+
   let promises = [];
+
   matchIdArray.forEach((match) => {
     promises.push(
       make_API_call(
@@ -67,9 +69,8 @@ const getHistoryDetails = (matchIdArray, region) => {
     );
   });
 
-  Promise.all(promises).then((result) => {
-    console.log("all resolved ", result);
-  });
+  const history = await Promise.all(promises);
+  return history;
 };
 
 export { fetchByName, fetchDivision, getSummonerMatchList, getHistoryDetails };
