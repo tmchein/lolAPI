@@ -30,26 +30,11 @@ app.get("/user/:username/:region", async (req, res) => {
   };
 
   const rankedDivision = await fetchDivision(id, region);
+  const matchList = await getSummonerMatchList(puuid, region);
+  const matchHistory = await getHistoryDetails(matchList, region, username);
 
-  const matchList = await getSummonerMatchList(puuid, region); // Array de string, matchids
-
-  //Mandar la lista a una funcion
-  getHistoryDetails(matchList);
-
-  res.send({ summonerInfo, rankedDivision, matchList });
+  res.send({ summonerInfo, rankedDivision, matchHistory });
 });
-
-/* app.get("/user/match/:id", async (req, res) => {
-  const { id } = req.params;
-
-  const match = await getMatchDetails(id);
-
-  if (!match) {
-    res
-      .status(404)
-      .send({ message: "Cannot fetch information about this match" });
-  }
-}); */
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);

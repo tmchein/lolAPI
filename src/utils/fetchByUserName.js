@@ -1,5 +1,6 @@
 import request from "postman-request";
 import CONTINENTS from "./continents.js";
+import { make_API_call } from "./helper.js";
 
 const getContinentByRegion = (region) => {
   const DEFAULT_CONTINENT = "americas";
@@ -43,7 +44,7 @@ const getSummonerMatchList = (userPuuid, region) => {
   return new Promise((resolve, reject) => {
     const continent = getContinentByRegion(region);
     request(
-      `https://${continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/${userPuuid}/ids?start=0&count=20&api_key=${process.env.API_KEY}`,
+      `https://${continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/${userPuuid}/ids?start=0&count=5&api_key=${process.env.API_KEY}`,
       { json: true },
       (error, response, body) => {
         if (error || body.length <= 0) {
@@ -55,19 +56,22 @@ const getSummonerMatchList = (userPuuid, region) => {
   });
 };
 
-const getHistoryDetails = (matchIdArray, region) => {
+const getHistoryDetails = async (matchIdArray, region, summonerName) => {
   const continent = getContinentByRegion(region);
-  matchIdArray.map((match) => {
-    request(
-      `https://${continent}.api.riotgames.com/lol/match/v5/matches/${match}?api_key=${process.env.API_KEY}`,
-      { json: true },
-      (error, response, body) => {
-        const { metadata } = body;
 
-        console.log(metadata);
-      }
+  let promises = [];
+
+  matchIdArray.forEach((match) => {
+    promises.push(
+      make_API_call(
+        `https://${continent}.api.riotgames.com/lol/match/v5/matches/${match}?api_key=${process.env.API_KEY}`,
+        summonerName
+      )
     );
   });
+
+  const history = await Promise.all(promises);
+  return history;
 };
 
 export { fetchByName, fetchDivision, getSummonerMatchList, getHistoryDetails };
