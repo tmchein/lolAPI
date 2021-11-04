@@ -58,7 +58,7 @@ const make_API_call = (url, summoner) => {
         }
       );
 
-      resolve([{ date: gameCreation }, matchData]);
+      resolve([{ date: new Date(gameCreation).toJSON() }, matchData]);
     });
   });
 };
