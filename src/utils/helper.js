@@ -1,11 +1,18 @@
 import request from "postman-request";
+import QUEUEIDS from "./queueNames.js";
+
+const getQueueName = (queueId) => {
+  const DEFAULT_QUEUE = 1;
+  const queueName = QUEUEIDS[queueId] || DEFAULT_QUEUE;
+  return queueName;
+};
 
 const make_API_call = (url, summoner) => {
   return new Promise((resolve, reject) => {
     request(url, { json: true }, (err, res, body) => {
       if (err) reject(err);
       const {
-        info: { participants, gameCreation },
+        info: { participants, gameCreation, queueId },
       } = body;
 
       const matchData = participants.map(
@@ -58,7 +65,13 @@ const make_API_call = (url, summoner) => {
         }
       );
 
-      resolve([{ date: new Date(gameCreation).toJSON() }, matchData]);
+      resolve([
+        {
+          date: new Date(gameCreation).toJSON(),
+          gameMode: getQueueName(queueId),
+        },
+        matchData,
+      ]);
     });
   });
 };

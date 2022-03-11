@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 import express from "express";
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3030;
 
 dotenv.config();
 
@@ -17,8 +17,8 @@ app.get("/user/:username/:region", async (req, res) => {
   const { username, region } = req.params;
   const summoner = await fetchByName(region, encodeURIComponent(username));
 
-  if (!summoner) {
-    res.status(404).send({ message: "No summoner found" });
+  if (summoner.status) {
+    return res.status(404).send(summoner.status);
   }
 
   const { id, accountId, puuid, revisionDate, profileIconId, ...userData } =
